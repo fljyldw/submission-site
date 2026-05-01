@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>学生提交 - 作业提交系统</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      height: 100vh;
+      display: flex;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #333;
+      overflow: hidden;
+    }
+
+    /* ===== 左侧栏（与后台一致） ===== */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: linear-gradient(180deg, #1a1f36 0%, #2a2f4a 100%);
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      z-index: 60;
+    }
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-header p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 0;
+      overflow-y: auto;
+    }
+    .nav-section {
+      padding: 0 14px;
+      margin-bottom: 8px;
+    }
+    .nav-section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+      padding: 8px 6px 4px;
+      font-weight: 600;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    .nav-item.active {
+      background: rgba(102, 126, 234, 0.25);
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-item .nav-icon { font-size: 17px; width: 24px; text-align: center; }
+    .sidebar-footer {
+      padding: 14px 18px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-footer a {
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .sidebar-footer a:hover { color: #fff; }
+
+    /* ===== 右侧主区域 ===== */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f0f2f5;
+    }
+    .topbar {
+      background: #fff;
+      padding: 0 28px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      flex-shrink: 0;
+      z-index: 50;
+    }
+    .topbar h1 { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+    .topbar h1 span { color: #aaa; font-weight: 400; font-size: 13px; margin-left: 8px; }
+
+    .main-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 28px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* ===== 提交表单卡片 ===== */
+    .submit-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .submit-card-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .submit-card-header .icon {
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      margin: 0 auto 14px;
+    }
+    .submit-card-header h2 {
+      font-size: 20px;
+      color: #1a1a2e;
+      font-weight: 700;
+    }
+    .submit-card-header p {
+      color: #888;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    label span.required { color: #e74c3c; margin-left: 2px; }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #333;
+      transition: border-color 0.2s;
+      outline: none;
+      background: #fafafa;
+    }
+    input[type="text"]:focus { border-color: #667eea; background: #fff; }
+    input[type="text"]::placeholder { color: #bbb; }
+
+    .file-upload-area {
+      border: 2px dashed #d0d0d0;
+      border-radius: 10px;
+      padding: 28px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fafafa;
+    }
+    .file-upload-area:hover,
+    .file-upload-area.drag-over {
+      border-color: #667eea;
+      background: #f0eeff;
+    }
+    .file-upload-area .upload-icon { font-size: 32px; }
+    .file-upload-area p { color: #888; font-size: 12px; margin-top: 6px; }
+    .file-upload-area .file-name {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #667eea;
+      font-weight: 600;
+      word-break: break-all;
+    }
+    input[type="file"] { display: none; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .btn-submit:hover { opacity: 0.92; }
+    .btn-submit:active { transform: scale(0.98); }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* ===== 结果弹窗 ===== */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.show { display: flex; }
+    .result-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 32px 28px;
+      max-width: 460px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+      animation: pop 0.25s ease;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    @keyframes pop {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+    .result-box .result-icon { font-size: 52px; margin-bottom: 10px; }
+    .result-box h2 { font-size: 18px; color: #1a1a2e; margin-bottom: 10px; font-weight: 700; }
+    .result-box .result-msg {
+      color: #555;
+      font-size: 13px;
+      line-height: 1.7;
+      text-align: left;
+      background: #f8f8fc;
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+    }
+
+    /* 审核详情面板 */
+    .analysis-panel {
+      text-align: left;
+      margin-bottom: 14px;
+    }
+    .analysis-panel .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+    }
+    .analysis-panel .stat-row:last-child { border-bottom: none; }
+    .analysis-panel .stat-label { color: #888; }
+    .analysis-panel .stat-value { font-weight: 600; color: #333; }
+    .analysis-panel .stat-value.pass { color: #27ae60; }
+    .analysis-panel .stat-value.fail { color: #e74c3c; }
+    .analysis-panel .segment-list {
+      margin-top: 8px;
+      font-size: 12px;
+      color: #666;
+    }
+    .analysis-panel .segment-list .seg-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed #eee;
+    }
+    .analysis-panel .segment-list .seg-item:last-child { border-bottom: none; }
+
+    .result-box .submission-id {
+      margin-top: 12px;
+      background: #f4f4f8;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 12px;
+      color: #777;
+    }
+    .result-box .submission-id strong {
+      color: #667eea;
+      font-size: 16px;
+      display: block;
+      margin-top: 4px;
+      letter-spacing: 2px;
+    }
+    .btn-close {
+      margin-top: 16px;
+      padding: 10px 32px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .btn-close:hover { opacity: 0.9; }
+
+    .result-box.error .result-icon::before { content: "❌"; }
+    .result-box.pass .result-icon::before { content: "✅"; }
+    .result-box.fail .result-icon::before { content: "⚠️"; }
+
+    /* 加载动画 */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 3px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; min-width: 60px; }
+      .sidebar-header h2 span, .sidebar-header p, .nav-item span, .nav-section-title { display: none; }
+      .sidebar-header { padding: 14px 10px 10px; text-align: center; }
+      .nav-item { justify-content: center; padding: 10px 8px; }
+      .sidebar-footer a span { display: none; }
+      .main-scroll { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== 左侧栏 ===== -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2>📚 <span>提交系统</span></h2>
+    <p>GPS 轨迹作业审核</p>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">导航</div>
+      <a href="/submit" class="nav-item active">
+        <span class="nav-icon">📄</span>
+        <span>提交作业</span>
+      </a>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <a href="/"><span>←</span> <span>返回首页</span></a>
+  </div>
+</div>
+
+<!-- ===== 右侧主区域 ===== -->
+<div class="content-area">
+  <div class="topbar">
+    <h1>📄 提交作业 <span>填写信息并上传 CSV 文件</span></h1>
+  </div>
+
+  <div class="main-scroll">
+    <div class="submit-card">
+      <div class="submit-card-header">
+        <div class="icon">📤</div>
+        <h2>作业提交</h2>
+        <p>请填写信息并上传 GPS 轨迹 CSV 文件完成提交</p>
+      </div>
+
+      <form id="submitForm">
+        <div class="form-group">
+          <label for="name">姓名<span class="required">*</span></label>
+          <input type="text" id="name" placeholder="请输入您的真实姓名" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label for="student_id">学号<span class="required">*</span></label>
+          <input type="text" id="student_id" placeholder="请输入您的学号" autocomplete="off" />
+        </div>
+        <div class="form-group">
+          <label>CSV 文件<span class="required">*</span></label>
+          <div class="file-upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
+            <div class="upload-icon">📂</div>
+            <p>点击或拖拽 CSV 文件到此处</p>
+            <p>仅支持 .csv 格式</p>
+            <div class="file-name" id="fileName"></div>
+          </div>
+          <input type="file" id="csvFile" accept=".csv" />
+        </div>
+        <button type="submit" class="btn-submit" id="submitBtn">提 交</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 结果弹窗 ===== -->
+<div class="overlay" id="overlay">
+  <div class="result-box" id="resultBox">
+    <div class="result-icon"></div>
+    <h2 id="resultTitle"></h2>
+    <div class="result-msg" id="resultMsg"></div>
+    <div class="analysis-panel" id="analysisPanel" style="display:none"></div>
+    <div class="submission-id" id="submissionInfo" style="display:none">
+      提交编号
+      <strong id="submissionId"></strong>
+    </div>
+    <button class="btn-close" onclick="closeResult()">确 定</button>
+  </div>
+</div>
+
+<script>
+  const uploadArea = document.getElementById("uploadArea");
+  const csvFile   = document.getElementById("csvFile");
+  const fileName  = document.getElementById("fileName");
+
+  csvFile.addEventListener("change", () => {
+    if (csvFile.files[0]) {
+      fileName.textContent = "已选择：" + csvFile.files[0].name;
+    }
+  });
+
+  uploadArea.addEventListener("dragover", e => {
+    e.preventDefault();
+    uploadArea.classList.add("drag-over");
+  });
+  uploadArea.addEventListener("dragleave", () => uploadArea.classList.remove("drag-over"));
+  uploadArea.addEventListener("drop", e => {
+    e.preventDefault();
+    uploadArea.classList.remove("drag-over");
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      csvFile.files = e.dataTransfer.files;
+      fileName.textContent = "已选择：" + file.name;
+    }
+  });
+
+  document.getElementById("submitForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name       = document.getElementById("name").value.trim();
+    const student_id = document.getElementById("student_id").value.trim();
+    const file       = csvFile.files[0];
+
+    if (!name || !student_id || !file) {
+      showError("信息不完整", "请确保姓名、学号和 CSV 文件均已填写/上传。");
+      return;
+    }
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>提交中...';
+
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("student_id", student_id);
+    formData.append("csv_file", file);
+
+    try {
+      const verifyRes = await fetch("/api/validate-student", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, student_id }),
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok || !verifyData.valid) {
+        showError("身份校验失败", verifyData.message || "姓名与学号校验未通过");
+        return;
+      }
+
+      const res  = await fetch("/api/submit", { method: "POST", body: formData });
+      const data = await res.json();
+
+      if (data.success) {
+        showAuditResult(data);
+        document.getElementById("submitForm").reset();
+        fileName.textContent = "";
+      } else {
+        showError("提交失败", data.message || "服务器返回错误，请重试。");
+      }
+    } catch (err) {
+      showError("网络错误", "无法连接到服务器，请检查网络后重试。");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = "提 交";
+    }
+  });
+
+  function showError(title, msg) {
+    const box  = document.getElementById("resultBox");
+    const info = document.getElementById("submissionInfo");
+    const panel = document.getElementById("analysisPanel");
+    box.className = "result-box error";
+    document.getElementById("resultTitle").textContent = title;
+    document.getElementById("resultMsg").textContent   = msg;
+    info.style.display = "none";
+    panel.style.display = "none";
+    document.getElementById("overlay").classList.add("show");
+  }
+
+  function showAuditResult(data) {
+    const box   = document.getElementById("resultBox");
+    const info  = document.getElementById("submissionInfo");
+    const panel = document.getElementById("analysisPanel");
+    const a = data.analysis;
+
+    box.className = "result-box " + (data.passed ? "pass" : "fail");
+    document.getElementById("resultTitle").textContent = data.passed ? "审核通过" : "审核未通过";
+    document.getElementById("resultMsg").textContent   = data.message;
+
+    let html = "";
+    html += `<div class="stat-row"><span class="stat-label">累计录制时长</span><span class="stat-value">${a.total_duration_str}</span></div>`;
+
+    panel.innerHTML = html;
+    panel.style.display = "block";
+
+    const submissionIdEl = document.getElementById("submissionId");
+    if (data.submission_id && submissionIdEl) {
+      info.style.display = "block";
+      submissionIdEl.textContent = data.submission_id;
+    } else {
+      info.style.display = "none";
+    }
+
+    document.getElementById("overlay").classList.add("show");
+  }
+
+  function closeResult() {
+    document.getElementById("overlay").classList.remove("show");
+  }
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 # 上传文件和运行数据
 uploads/
 submissions.json
+.env
 
 # Python
 __pycache__/

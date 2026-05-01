@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>学生端 - 作业提交系统</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { height: 100vh; display: flex; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; color: #333; overflow: hidden; }
+    .sidebar {
+      width: 220px; min-width: 220px; background: linear-gradient(180deg, #1a1f36 0%, #2a2f4a 100%);
+      display: flex; flex-direction: column; color: #fff; z-index: 60;
+    }
+    .sidebar-header { padding: 20px 18px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-header h2 { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .sidebar-header p { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+    .nav-section { padding: 0 14px; margin-bottom: 8px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 8px; cursor: pointer;
+      transition: all 0.15s; font-size: 13px; color: rgba(255,255,255,0.65); text-decoration: none; margin-bottom: 2px;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+    .nav-item.active { background: rgba(102,126,234,0.25); color: #fff; font-weight: 600; }
+    .sidebar-footer { padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.08); }
+    .sidebar-footer a {
+      color: rgba(255,255,255,0.5);
+      text-decoration: none;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .sidebar-footer a:hover { color: #fff; }
+    .content-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #f0f2f5; }
+    .topbar {
+      background: #fff; padding: 0 28px; height: 52px; display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06); flex-shrink: 0;
+    }
+    .topbar h1 { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+    .topbar span { color: #aaa; font-weight: 400; font-size: 13px; margin-left: 8px; }
+    .main-scroll { flex: 1; overflow-y: auto; padding: 24px 28px; }
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .card {
+      background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px;
+    }
+    .title { font-size: 18px; color: #1a1a2e; font-weight: 700; margin-bottom: 14px; }
+    label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; font-weight: 600; }
+    input[type="text"] {
+      width: 100%; padding: 10px 14px; border: 1.5px solid #e0e0e0; border-radius: 8px; font-size: 14px;
+      background: #fafafa; outline: none; margin-bottom: 14px;
+    }
+    .file-upload-area {
+      border: 2px dashed #d0d0d0; border-radius: 10px; padding: 24px 14px; text-align: center; cursor: pointer; background: #fafafa;
+    }
+    .file-upload-area:hover { border-color: #667eea; background: #f0eeff; }
+    input[type="file"] { display: none; }
+    .file-name { margin-top: 8px; color: #667eea; font-size: 13px; font-weight: 600; word-break: break-all; }
+    .btn-primary {
+      width: 100%; border: 0; border-radius: 8px; padding: 12px; background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff; font-size: 15px; font-weight: 700; cursor: pointer;
+    }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; text-align: left; }
+    th { background: #f7f8fa; color: #666; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .pass { background: #e6f7ed; color: #1e8c4d; }
+    .fail { background: #fef0f0; color: #d63031; }
+    .muted { color: #888; font-size: 12px; }
+  </style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2>🎓 <span>学生端</span></h2>
+    <p>作业提交系统</p>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-item active" id="nav-submit" onclick="switchPanel('submit')">📤 数据提交</div>
+      <div class="nav-item" id="nav-query" onclick="switchPanel('query')">📄 提交查询</div>
+    </div>
+  </div>
+  <div class="sidebar-footer">
+    <a href="/"><span>←</span> <span>返回首页</span></a>
+  </div>
+</div>
+
+<div class="content-area">
+  <div class="topbar">
+    <h1 id="topTitle">数据提交 <span id="topSub">上传 CSV 并提交审核</span></h1>
+  </div>
+  <div class="main-scroll">
+    <div id="panel-submit" class="panel active">
+      <div class="card">
+        <div class="title">作业提交</div>
+        <label>CSV 文件</label>
+        <div class="file-upload-area" onclick="document.getElementById('csvFile').click()">
+          点击选择 CSV 文件
+          <div class="file-name" id="fileName"></div>
+        </div>
+        <input type="file" id="csvFile" accept=".csv" />
+        <button class="btn-primary" id="submitBtn" onclick="submitCsv()">提交审核</button>
+      </div>
+      <div class="card" id="submitResult" style="display:none;"></div>
+    </div>
+
+    <div id="panel-query" class="panel">
+      <div class="card">
+        <div class="title">我的提交记录</div>
+        <button class="btn-primary" onclick="loadMyRecords()">刷新记录</button>
+      </div>
+      <div class="card">
+        <table>
+          <thead><tr><th>提交编号</th><th>提交时间</th><th>状态</th><th>时长</th></tr></thead>
+          <tbody id="recordsBody"><tr><td colspan="4" class="muted">暂无数据</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const csvFile = document.getElementById("csvFile");
+  const fileName = document.getElementById("fileName");
+  csvFile.addEventListener("change", () => {
+    fileName.textContent = csvFile.files[0] ? ("已选择：" + csvFile.files[0].name) : "";
+  });
+
+  function switchPanel(name) {
+    document.getElementById("panel-submit").classList.toggle("active", name === "submit");
+    document.getElementById("panel-query").classList.toggle("active", name === "query");
+    document.getElementById("nav-submit").classList.toggle("active", name === "submit");
+    document.getElementById("nav-query").classList.toggle("active", name === "query");
+    document.getElementById("topTitle").innerHTML = name === "submit" ? "数据提交 <span id='topSub'>上传 CSV 并提交审核</span>" : "提交查询 <span id='topSub'>仅查看本人提交记录</span>";
+    if (name === "query") loadMyRecords();
+  }
+
+  async function submitCsv() {
+    if (!csvFile.files[0]) { alert("请先选择 CSV 文件"); return; }
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.textContent = "提交中...";
+    const fd = new FormData();
+    fd.append("csv_file", csvFile.files[0]);
+    try {
+      const res = await fetch("/api/submit", { method: "POST", body: fd });
+      const data = await res.json();
+      const box = document.getElementById("submitResult");
+      box.style.display = "";
+      if (!res.ok || !data.success) {
+        box.innerHTML = `<div class="title">提交失败</div><div>${data.message || "提交失败"}</div>`;
+        return;
+      }
+      box.innerHTML = `<div class="title">提交成功</div><div>状态：${data.status}</div><div>编号：${data.submission_id}</div><div>${data.message}</div>`;
+      csvFile.value = "";
+      fileName.textContent = "";
+    } catch (e) {
+      alert("网络异常，提交失败");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "提交审核";
+    }
+  }
+
+  async function loadMyRecords() {
+    try {
+      const res = await fetch("/api/my-records");
+      const data = await res.json();
+      if (!res.ok) {
+        document.getElementById("recordsBody").innerHTML = `<tr><td colspan="4" class="muted">${data.message || "加载失败"}</td></tr>`;
+        return;
+      }
+      const rows = data.records || [];
+      if (!rows.length) {
+        document.getElementById("recordsBody").innerHTML = '<tr><td colspan="4" class="muted">暂无提交记录</td></tr>';
+        return;
+      }
+      document.getElementById("recordsBody").innerHTML = rows.map(r => {
+        const cls = r.status === "审核通过" ? "pass" : "fail";
+        const t = r.submitted_at ? r.submitted_at.replace("T", " ").slice(0, 19) : "-";
+        return `<tr>
+          <td><code>${r.submission_id}</code></td>
+          <td>${t}</td>
+          <td><span class="badge ${cls}">${r.status}</span></td>
+          <td>${r.max_duration_str || "-"}</td>
+        </tr>`;
+      }).join("");
+    } catch (e) {
+      document.getElementById("recordsBody").innerHTML = '<tr><td colspan="4" class="muted">网络异常</td></tr>';
+    }
+  }
+
+</script>
+</body>
+</html>

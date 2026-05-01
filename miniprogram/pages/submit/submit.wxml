@@ -1,0 +1,40 @@
+<view class="container">
+  <view class="page-head">
+    <view class="page-head-title">学生提交</view>
+    <view class="page-head-subtitle">填写信息并上传 GPS 轨迹 CSV</view>
+  </view>
+
+  <view class="card">
+    <view class="title">提交表单</view>
+    <view class="muted">当前身份：{{name}}（{{studentId}}）</view>
+
+    <view class="label">CSV文件</view>
+    <button class="ghost-btn" bindtap="chooseCsv">选择CSV文件</button>
+    <view class="muted" wx:if="{{fileName}}">
+      已选择：{{fileName}}
+    </view>
+    <view class="muted" wx:else>尚未选择文件</view>
+
+    <button
+      class="btn primary-btn"
+      loading="{{uploading}}"
+      disabled="{{uploading}}"
+      bindtap="submitForm"
+    >
+      {{uploading ? '上传中...' : '提交审核'}}
+    </button>
+  </view>
+
+  <view class="card" wx:if="{{result}}">
+    <view class="title">审核结果</view>
+    <view>
+      状态：
+      <text class="status-pill {{result.passed ? 'status-pass' : 'status-fail'}}">
+        {{result.status}}
+      </text>
+    </view>
+    <view>提交编号：{{result.submission_id}}</view>
+    <view>说明：{{result.message}}</view>
+  </view>
+
+</view>
