@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="page-head">
+    <view class="page-head-title">提交记录</view>
+    <view class="page-head-subtitle">查看所有已提交作业与审核状态</view>
+  </view>
+
+  <view class="card">
+    <view class="title">记录列表</view>
+    <view class="muted">当前身份：{{name}}（{{studentId}}）</view>
+    <button class="primary-btn" bindtap="loadRecords" loading="{{loading}}" disabled="{{loading}}">
+      刷新记录
+    </button>
+    <view class="muted">共 {{total}} 条</view>
+  </view>
+
+  <block wx:for="{{records}}" wx:key="submission_id">
+    <view class="card">
+      <view>姓名：{{item.name}}</view>
+      <view>学号：{{item.student_id}}</view>
+      <view>提交编号：{{item.submission_id}}</view>
+      <view>
+        状态：
+        <text class="status-pill {{item.status === '审核通过' ? 'status-pass' : 'status-fail'}}">
+          {{item.status}}
+        </text>
+      </view>
+      <view class="muted">提交时间：{{item.submitted_at}}</view>
+    </view>
+  </block>
+
+  <view wx:if="{{!loading && records.length === 0}}" class="card muted">
+    暂无记录
+  </view>
+</view>

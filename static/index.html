@@ -6,358 +6,393 @@
   <title>作业提交系统</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      color: #333;
+      overflow: hidden;
+    }
+
+    /* ===== 左侧栏 ===== */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: linear-gradient(180deg, #1a1f36 0%, #2a2f4a 100%);
+      display: flex;
+      flex-direction: column;
+      color: #fff;
+      z-index: 60;
+    }
+    .sidebar-header {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .sidebar-header h2 {
+      font-size: 15px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-header p {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+    }
+    .sidebar-nav {
+      flex: 1;
+      padding: 12px 0;
+      overflow-y: auto;
+    }
+    .nav-section {
+      padding: 0 14px;
+      margin-bottom: 8px;
+    }
+    .nav-section-title {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 1px;
+      padding: 8px 6px 4px;
+      font-weight: 600;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 13px;
+      color: rgba(255,255,255,0.65);
+      text-decoration: none;
+      margin-bottom: 2px;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    .nav-item.active {
+      background: rgba(102, 126, 234, 0.25);
+      color: #fff;
+      font-weight: 600;
+    }
+    .nav-item .nav-icon { font-size: 17px; width: 24px; text-align: center; }
+    .sidebar-footer {
+      padding: 14px 18px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+    }
+
+    /* ===== 右侧主区域 ===== */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #f0f2f5;
+    }
+    .topbar {
+      background: #fff;
+      padding: 0 28px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      flex-shrink: 0;
+      z-index: 50;
+    }
+    .topbar h1 { font-size: 16px; font-weight: 700; color: #1a1a2e; }
+    .topbar h1 span { color: #aaa; font-weight: 400; font-size: 13px; margin-left: 8px; }
+
+    .main-scroll {
+      flex: 1;
+      overflow-y: auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-      padding: 20px;
+      padding: 40px 28px;
     }
 
-    .card {
+    /* ===== 角色选择卡片 ===== */
+    .cards {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 660px;
+    }
+    .role-card {
+      width: 280px;
       background: #fff;
       border-radius: 16px;
-      padding: 40px 36px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-    }
-
-    .card-header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    .card-header .icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
-
-    .card-header h1 {
-      font-size: 24px;
-      color: #1a1a2e;
-      font-weight: 700;
-    }
-
-    .card-header p {
-      color: #888;
-      font-size: 14px;
-      margin-top: 6px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-    }
-
-    label span.required {
-      color: #e74c3c;
-      margin-left: 2px;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 14px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 15px;
-      color: #333;
-      transition: border-color 0.2s;
-      outline: none;
-    }
-
-    input[type="text"]:focus {
-      border-color: #667eea;
-    }
-
-    .file-upload-area {
-      border: 2px dashed #c5c5c5;
-      border-radius: 8px;
-      padding: 28px 16px;
+      padding: 36px 28px;
       text-align: center;
       cursor: pointer;
-      transition: all 0.2s;
-      background: #fafafa;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-decoration: none;
+      color: #333;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+    .role-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+    }
+    .role-card.student::before { background: linear-gradient(90deg, #667eea, #764ba2); }
+    .role-card.admin::before { background: linear-gradient(90deg, #f093fb, #f5576c); }
+
+    .role-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.12);
     }
 
-    .file-upload-area:hover,
-    .file-upload-area.drag-over {
-      border-color: #667eea;
-      background: #f0eeff;
+    .role-card .card-icon {
+      width: 64px; height: 64px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin: 0 auto 20px;
     }
+    .role-card.student .card-icon { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .role-card.admin .card-icon { background: linear-gradient(135deg, #f093fb, #f5576c); }
 
-    .file-upload-area .upload-icon { font-size: 36px; }
-
-    .file-upload-area p {
-      color: #888;
-      font-size: 13px;
-      margin-top: 8px;
-    }
-
-    .file-upload-area .file-name {
-      margin-top: 10px;
+    .role-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 10px; color: #1a1a2e; }
+    .role-card p { font-size: 13px; color: #888; line-height: 1.7; }
+    .role-card .arrow {
+      margin-top: 18px;
       font-size: 14px;
-      color: #667eea;
-      font-weight: 600;
-      word-break: break-all;
+      color: #aaa;
+      transition: all 0.3s ease;
     }
+    .role-card:hover .arrow { color: #667eea; transform: translateX(4px); }
 
-    input[type="file"] { display: none; }
-
-    .btn-submit {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: opacity 0.2s, transform 0.1s;
-      margin-top: 8px;
-    }
-
-    .btn-submit:hover { opacity: 0.92; }
-    .btn-submit:active { transform: scale(0.98); }
-    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    /* 结果弹窗 */
     .overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
-      z-index: 100;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 200;
       align-items: center;
       justify-content: center;
     }
-
     .overlay.show { display: flex; }
-
-    .result-box {
+    .login-box {
       background: #fff;
       border-radius: 16px;
-      padding: 36px 32px;
-      max-width: 380px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
-      animation: pop 0.25s ease;
+      width: 92%;
+      max-width: 420px;
+      padding: 28px 24px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+      animation: pop 0.2s ease;
     }
-
     @keyframes pop {
-      from { transform: scale(0.8); opacity: 0; }
-      to   { transform: scale(1);   opacity: 1; }
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
-
-    .result-box .result-icon { font-size: 56px; margin-bottom: 12px; }
-
-    .result-box h2 {
-      font-size: 20px;
-      color: #1a1a2e;
-      margin-bottom: 8px;
-    }
-
-    .result-box .result-msg {
-      color: #555;
+    .login-box h3 { font-size: 20px; color: #1a1a2e; margin-bottom: 8px; }
+    .login-box p { color: #888; font-size: 13px; margin-bottom: 14px; }
+    .login-box input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      background: #fafafa;
+      outline: none;
       font-size: 14px;
-      line-height: 1.6;
     }
-
-    .result-box .submission-id {
-      margin-top: 14px;
-      background: #f4f4f8;
+    .login-box input:focus { border-color: #667eea; background: #fff; }
+    .login-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn {
+      flex: 1;
+      border: 0;
       border-radius: 8px;
-      padding: 10px 16px;
-      font-size: 13px;
-      color: #777;
-    }
-
-    .result-box .submission-id strong {
-      color: #667eea;
-      font-size: 18px;
-      display: block;
-      margin-top: 4px;
-      letter-spacing: 2px;
-    }
-
-    .btn-close {
-      margin-top: 20px;
-      padding: 10px 32px;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
       cursor: pointer;
+      padding: 10px 12px;
+      font-size: 14px;
       font-weight: 600;
     }
-
-    .result-box.error .result-icon::before { content: "❌"; }
-    .result-box.success .result-icon::before { content: "✅"; }
-
-    /* 加载动画 */
-    .spinner {
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      border: 3px solid rgba(255,255,255,0.4);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-ghost {
+      background: #eef0f4;
+      color: #666;
+    }
+    .login-msg {
+      min-height: 18px;
+      margin-top: 10px;
+      color: #d63031;
+      font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 60px; min-width: 60px; }
+      .sidebar-header h2 span, .sidebar-header p, .nav-item span, .nav-section-title { display: none; }
+      .sidebar-header { padding: 14px 10px 10px; text-align: center; }
+      .nav-item { justify-content: center; padding: 10px 8px; }
+      .main-scroll { padding: 24px 16px; }
+    }
   </style>
 </head>
 <body>
 
-<div class="card">
-  <div class="card-header">
-    <div class="icon">📄</div>
-    <h1>作业提交系统</h1>
-    <p>请填写信息并上传 CSV 文件完成提交</p>
+<!-- 左侧栏 -->
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2>📚 <span>提交系统</span></h2>
+    <p>GPS 轨迹作业审核</p>
   </div>
-
-  <form id="submitForm">
-    <div class="form-group">
-      <label for="name">姓名<span class="required">*</span></label>
-      <input type="text" id="name" placeholder="请输入您的真实姓名" autocomplete="off" />
-    </div>
-
-    <div class="form-group">
-      <label for="student_id">学号<span class="required">*</span></label>
-      <input type="text" id="student_id" placeholder="请输入您的学号" autocomplete="off" />
-    </div>
-
-    <div class="form-group">
-      <label>CSV 文件<span class="required">*</span></label>
-      <div class="file-upload-area" id="uploadArea" onclick="document.getElementById('csvFile').click()">
-        <div class="upload-icon">📂</div>
-        <p>点击或拖拽 CSV 文件到此处</p>
-        <p>仅支持 .csv 格式</p>
-        <div class="file-name" id="fileName"></div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">导航</div>
+      <div class="nav-item active">
+        <span class="nav-icon">🏠</span>
+        <span>首页</span>
       </div>
-      <input type="file" id="csvFile" accept=".csv" />
     </div>
-
-    <button type="submit" class="btn-submit" id="submitBtn">提 交</button>
-  </form>
+  </div>
+  <div class="sidebar-footer">v1.0 · 作业提交系统</div>
 </div>
 
-<!-- 结果弹窗 -->
-<div class="overlay" id="overlay">
-  <div class="result-box" id="resultBox">
-    <div class="result-icon"></div>
-    <h2 id="resultTitle"></h2>
-    <div class="result-msg" id="resultMsg"></div>
-    <div class="submission-id" id="submissionInfo" style="display:none">
-      提交编号
-      <strong id="submissionId"></strong>
+<!-- 右侧主区域 -->
+<div class="content-area">
+  <div class="topbar">
+    <h1>首页 <span>请选择您的身份以继续</span></h1>
+  </div>
+  <div class="main-scroll">
+    <div class="cards">
+      <a href="javascript:void(0)" class="role-card student" onclick="openStudentLogin()">
+        <div class="card-icon">🎓</div>
+        <h2>学生提交</h2>
+        <p>填写姓名和学号，<br>上传 GPS 轨迹 CSV 文件</p>
+        <div class="arrow">进入 →</div>
+      </a>
+      <a href="javascript:void(0)" class="role-card admin" onclick="openAdminLogin()">
+        <div class="card-icon">🔧</div>
+        <h2>管理员入口</h2>
+        <p>查看所有提交记录，<br>数据分析与导出</p>
+        <div class="arrow">进入 →</div>
+      </a>
     </div>
-    <button class="btn-close" onclick="closeResult()">确 定</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="login-box">
+    <h3 id="loginTitle">登录</h3>
+    <p id="loginDesc"></p>
+    <div id="studentFields">
+      <input id="studentName" placeholder="请输入姓名" autocomplete="off" />
+      <input id="studentId" placeholder="请输入学号" autocomplete="off" />
+    </div>
+    <div id="adminFields" style="display:none;">
+      <input id="adminPassword" type="password" placeholder="请输入管理员密码" autocomplete="off" />
+    </div>
+    <div class="login-actions">
+      <button class="btn btn-primary" onclick="doLogin()">进入</button>
+      <button class="btn btn-ghost" onclick="closeLogin()">取消</button>
+    </div>
+    <div class="login-msg" id="loginMsg"></div>
   </div>
 </div>
 
 <script>
-  const uploadArea = document.getElementById("uploadArea");
-  const csvFile   = document.getElementById("csvFile");
-  const fileName  = document.getElementById("fileName");
+  let currentLoginType = "";
 
-  // 文件选择
-  csvFile.addEventListener("change", () => {
-    if (csvFile.files[0]) {
-      fileName.textContent = "已选择：" + csvFile.files[0].name;
-    }
-  });
-
-  // 拖拽上传
-  uploadArea.addEventListener("dragover", e => {
-    e.preventDefault();
-    uploadArea.classList.add("drag-over");
-  });
-  uploadArea.addEventListener("dragleave", () => uploadArea.classList.remove("drag-over"));
-  uploadArea.addEventListener("drop", e => {
-    e.preventDefault();
-    uploadArea.classList.remove("drag-over");
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      csvFile.files = e.dataTransfer.files;
-      fileName.textContent = "已选择：" + file.name;
-    }
-  });
-
-  // 表单提交
-  document.getElementById("submitForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const name       = document.getElementById("name").value.trim();
-    const student_id = document.getElementById("student_id").value.trim();
-    const file       = csvFile.files[0];
-
-    if (!name || !student_id || !file) {
-      showResult(false, "信息不完整", "请确保姓名、学号和 CSV 文件均已填写/上传。");
-      return;
-    }
-
-    const btn = document.getElementById("submitBtn");
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>提交中...';
-
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("student_id", student_id);
-    formData.append("csv_file", file);
-
-    try {
-      const res  = await fetch("/api/submit", { method: "POST", body: formData });
-      const data = await res.json();
-
-      if (data.success) {
-        showResult(true, "提交成功 🎉", data.message, data.submission_id);
-        // 重置表单
-        document.getElementById("submitForm").reset();
-        fileName.textContent = "";
-      } else {
-        showResult(false, "提交失败", data.message || "服务器返回错误，请重试。");
-      }
-    } catch (err) {
-      showResult(false, "网络错误", "无法连接到服务器，请检查网络后重试。");
-    } finally {
-      btn.disabled = false;
-      btn.innerHTML = "提 交";
-    }
-  });
-
-  function showResult(success, title, msg, submissionId) {
-    const box   = document.getElementById("resultBox");
-    const info  = document.getElementById("submissionInfo");
-    box.className = "result-box " + (success ? "success" : "error");
-    document.getElementById("resultTitle").textContent = title;
-    document.getElementById("resultMsg").textContent   = msg;
-    if (success && submissionId) {
-      info.style.display = "block";
-      document.getElementById("submissionId").textContent = submissionId;
-    } else {
-      info.style.display = "none";
-    }
+  function openStudentLogin() {
+    currentLoginType = "student";
+    document.getElementById("loginTitle").textContent = "学生登录";
+    document.getElementById("loginDesc").textContent = "请输入姓名和学号后进入学生端";
+    document.getElementById("studentFields").style.display = "";
+    document.getElementById("adminFields").style.display = "none";
+    document.getElementById("loginMsg").textContent = "";
     document.getElementById("overlay").classList.add("show");
   }
 
-  function closeResult() {
+  function openAdminLogin() {
+    currentLoginType = "admin";
+    document.getElementById("loginTitle").textContent = "管理员登录";
+    document.getElementById("loginDesc").textContent = "请输入后台密码后进入管理页面";
+    document.getElementById("studentFields").style.display = "none";
+    document.getElementById("adminFields").style.display = "";
+    document.getElementById("loginMsg").textContent = "";
+    document.getElementById("overlay").classList.add("show");
+  }
+
+  function closeLogin() {
     document.getElementById("overlay").classList.remove("show");
   }
+
+  async function doLogin() {
+    const msg = document.getElementById("loginMsg");
+    msg.textContent = "";
+    try {
+      if (currentLoginType === "student") {
+        const name = document.getElementById("studentName").value.trim();
+        const student_id = document.getElementById("studentId").value.trim();
+        if (!name || !student_id) {
+          msg.textContent = "姓名和学号不能为空";
+          return;
+        }
+        const res = await fetch("/api/student/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, student_id }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          msg.textContent = data.message || "登录失败";
+          return;
+        }
+        window.location.href = "/submit";
+        return;
+      }
+
+      if (currentLoginType === "admin") {
+        const password = document.getElementById("adminPassword").value;
+        if (!password) {
+          msg.textContent = "请输入密码";
+          return;
+        }
+        const res = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) {
+          msg.textContent = data.message || "登录失败";
+          return;
+        }
+        window.location.href = "/admin";
+      }
+    } catch (err) {
+      msg.textContent = "网络异常，请稍后重试";
+    }
+  }
+
+  (function autoOpenByQuery() {
+    const type = new URLSearchParams(window.location.search).get("login");
+    if (type === "student") openStudentLogin();
+    if (type === "admin") openAdminLogin();
+  })();
 </script>
+
 </body>
 </html>

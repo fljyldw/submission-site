@@ -1,0 +1,25 @@
+<view class="container">
+  <view class="page-head">
+    <view class="page-head-title">学生入口</view>
+    <view class="page-head-subtitle">先完成身份认证，再选择功能</view>
+  </view>
+
+  <view class="card" wx:if="{{!authed}}">
+    <view class="title">身份认证</view>
+    <view class="label">姓名</view>
+    <input class="input" placeholder="请输入姓名" value="{{name}}" bindinput="onNameInput" />
+    <view class="label">学号</view>
+    <input class="input" placeholder="请输入学号" value="{{studentId}}" bindinput="onStudentIdInput" />
+    <button class="primary-btn" bindtap="verifyStudent" loading="{{verifying}}" disabled="{{verifying}}">
+      {{verifying ? "认证中..." : "确认并进入"}}
+    </button>
+  </view>
+
+  <view class="card" wx:if="{{authed}}">
+    <view class="title">欢迎，{{name}}</view>
+    <view class="muted">学号：{{studentId}}</view>
+    <button class="primary-btn menu-btn" bindtap="goSubmit">数据提交</button>
+    <button class="ghost-btn menu-btn" bindtap="goRecords">提交查询</button>
+    <button class="ghost-btn menu-btn" bindtap="resetAuth">切换身份</button>
+  </view>
+</view>
